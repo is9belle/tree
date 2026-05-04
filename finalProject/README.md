@@ -1,4 +1,3 @@
-cat > /mnt/user-data/outputs/README.md << 'EOF'
 # tree 🌲
 
 > A programming language where your **folder structure is the source code**.
