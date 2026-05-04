@@ -1,0 +1,96 @@
+Program:
+    statements+=Statement
+;
+
+Statement:
+    Comment | IfStatement | WhileLoop | ForLoop | Assignment | Conditional | Print 
+;
+
+Comment:
+    '#' ID
+;
+
+IfStatement:
+    'if' '('
+        condition=Conditional ','
+        'do' '(' then_body*=Statement[','] ')'
+        (',' 'elif' '(' elif_condition=Conditional ',' 'do' '(' elif_body*=Statement[','] ')' ')')*
+        (',' 'else' '(' else_body*=Statement[','] ')')?
+    ')'
+;
+
+WhileLoop:
+    'while' '('
+        condition=Conditional ','
+        'do' '(' body*=Statement[','] ')'
+    ')'
+;
+
+ForLoop:
+    'for' '('
+        init=Assignment ','
+        condition=Conditional ','
+        step=Assignment ','
+        'do' '(' body*=Statement[','] ')'
+    ')'
+;
+
+Assignment:
+    'assign' '(' var=ID ',' value=Value ')'
+;
+
+Conditional:
+    'True' | 'False' | (op=CondOp '(' left=Value (',' right=Value)? ')')
+;
+
+CondOp:
+    'not' | 'and' | 'or' | 'notequals' | 'lessthanorequal' | 'greaterthanorequal' | 'lessthan' | 'greaterthan' | 'equals'
+;
+
+Print:
+    'print' '(' value+=Value[','] ')'
+;
+
+Add:
+    'add' '(' values+=Value[','] ')'
+;
+
+Sub:
+    'sub' '(' minuend=Value ',' subtrahend=Value ')'
+;
+
+Mul:
+    'mul' '(' values+=Value[','] ')'
+;
+
+Div:
+    'div' '(' dividend=Value ',' divisor=Value ')'
+;
+
+Mod:
+    'mod' '(' dividend=Value ',' modulus=Value ')'
+;
+
+Value:
+    Input | Expression | StringLiteral | NumberLiteral | VarRef
+;
+
+Input:
+    'input'
+;
+
+Expression:
+    Add | Sub | Mul | Div | Mod
+;
+
+StringLiteral:
+    value=STRING
+;
+
+NumberLiteral:
+    value=NUMBER
+;
+
+VarRef:
+    name=ID
+;
