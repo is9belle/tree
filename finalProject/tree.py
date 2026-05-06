@@ -38,7 +38,7 @@ def parse_tree_output(output):
         if not line.strip():
             continue
         # Skip tree header/footer lines
-        if re.match(r'^[A-Za-z]:.', line) or 'Folder PATH listing' in line or 'Volume serial number' in line or 'directories' in line:
+        if re.match(r'^[A-Za-z]:.', line) or path in line or 'Folder PATH listing' in line or 'Volume serial number' in line or ('directories,' in line and 'files' in line):
             continue
 
         # Calculate depth from prefix length
