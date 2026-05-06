@@ -14,6 +14,7 @@ if len(sys.argv) < 2:
     sys.argv.append(".")
 
 path = sys.argv[1]
+
 if platform.system() == "Windows":
     command = ["cmd", "/c", "tree", "/F", path]
 else:
@@ -37,11 +38,13 @@ def parse_tree_output(output):
     lines = output.splitlines()
     parsed = []
 
+    path_to_skip = path if path != "." else "C:"  # Windows tree output shows the root folder as "C:\path\to\folder"
+
     for line in lines:
         if not line.strip():
             continue
         # Skip tree header/footer lines
-        if re.match(r'^[A-Za-z]:.', line) or path in line or 'Folder PATH listing' in line or 'Volume serial number' in line or ('directories,' in line and 'files' in line):
+        if re.match(r'^[A-Za-z]:.', line) or path_to_skip in line or 'Folder PATH listing' in line or 'Volume serial number' in line or ('directories,' in line and 'files' in line):
             continue
 
         # Calculate depth from prefix length
@@ -120,7 +123,7 @@ def nodes_to_program_text(nodes):
     """
     tree, _ = build_tree(nodes)
     parts = [tree_to_text(name, children) for name, children in tree]
-    return ','.join(parts)
+    return ', '.join(parts)
 
 # ─────────────────────────────────────────────
 # STEP 4: Parse with TextX
