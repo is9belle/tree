@@ -58,6 +58,16 @@ py tree.py Countdown.tree
 
 Point the interpreter at any `.tree` folder. It will print the parsed tree structure, the generated intermediate text, and the program output.
 
+## Tests
+
+Run the regression suite with:
+
+```bash
+python -m unittest discover -s tests
+```
+
+The current tests exercise the normal string-concatenation path, the sum example, and the comma-in-filename regression case.
+
 ---
 
 ## Language Reference

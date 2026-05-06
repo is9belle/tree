@@ -1,5 +1,5 @@
 Program:
-    statements+=Statement
+    statements+=Statement[',']
 ;
 
 Statement:
@@ -44,7 +44,7 @@ Conditional:
 ;
 
 CondOp:
-    'not' | 'and' | 'or' | 'notequals' | 'lessthanorequal' | 'greaterthanorequal' | 'lessthan' | 'greaterthan' | 'equals'
+    'notequals' | 'lessthanorequal' | 'greaterthanorequal' | 'lessthan' | 'greaterthan' | 'equals' | 'not' | 'and' | 'or'
 ;
 
 Print:

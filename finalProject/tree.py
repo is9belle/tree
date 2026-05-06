@@ -14,8 +14,11 @@ if len(sys.argv) < 2:
     sys.argv.append(".")
 
 path = sys.argv[1]
-command = f"tree /F {path}" if platform.system() == "Windows" else f"tree -a {path}"
-raw = subprocess.run(command, capture_output=True, text=True, shell=True)
+if platform.system() == "Windows":
+    command = ["cmd", "/c", "tree", "/F", path]
+else:
+    command = ["tree", "-a", path]
+raw = subprocess.run(command, capture_output=True, text=True)
 
 # ─────────────────────────────────────────────
 # STEP 2: Strip tree-drawing characters, preserve depth
@@ -85,14 +88,28 @@ def build_tree(nodes, index=0, parent_depth=-1):
 
     return result, index
 
+def encode_leaf_value(value):
+    """Return a leaf value as valid program text."""
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in ('"', "'"):
+        return value
+
+    if re.fullmatch(r'-?\d+(?:\.\d+)?', value):
+        return value
+
+    if re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', value):
+        return value
+
+    escaped = value.replace('\\', '\\\\').replace('"', '\\"')
+    return f'"{escaped}"'
+
 def tree_to_text(node_name, children):
     """
     Convert a node and its children into bracketed text.
     e.g. assign with children ['i', '1'] -> assign(i, 1)
     """
     if not children:
-        # Leaf node — just the value (number or variable)
-        return node_name
+        # Leaf node — emit plain identifiers/numbers, quote everything else.
+        return encode_leaf_value(node_name)
 
     child_texts = [tree_to_text(c_name, c_children) for c_name, c_children in children]
     return f"{node_name}({', '.join(child_texts)})"
@@ -103,7 +120,7 @@ def nodes_to_program_text(nodes):
     """
     tree, _ = build_tree(nodes)
     parts = [tree_to_text(name, children) for name, children in tree]
-    return ' '.join(parts)
+    return ','.join(parts)
 
 # ─────────────────────────────────────────────
 # STEP 4: Parse with TextX
