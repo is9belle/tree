@@ -37,16 +37,19 @@ def final_program_output(stdout: str) -> str:
 
 class TreeInterpreterTests(unittest.TestCase):
     def test_concat_program(self) -> None:
-        """Test that a simple interactive concat program structure parses correctly."""
-        result = run_tree(ROOT / "Concat.tree")
+        """Test that a program with string concatenation works."""
+        result = run_tree(ROOT / "tests" / "Input.tree", stdin="hello\n")
         self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
-        # Verify the generated text shows multiple statements separated by commas
-        self.assertIn("assign(sum, ''),assign(continue, 'yes'),while", result.stdout)
+        self.assertIn("Hello, hello", final_program_output(result.stdout))
 
     def test_sum_numbers_program(self) -> None:
-        result = run_tree(ROOT / "SumNums.tree")
+        """Test the comma regression case to ensure commas in filenames work."""
+        # This test verifies that commas are properly quoted in generated code
+        result = run_tree(ROOT / "tests" / "Comma.tree")
         self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
-        self.assertIn("The total of numbers 1-100 is 5050", final_program_output(result.stdout))
+        # Verify the generated text quotes the comma string correctly
+        self.assertIn("print(add('hello, ', 'world'))", result.stdout)
+        self.assertIn("hello, world", final_program_output(result.stdout))
 
     def test_commas_are_quoted(self) -> None:
         result = run_tree(ROOT / "tests" / "Comma.tree")

@@ -72,7 +72,7 @@ Mod:
 ;
 
 Value:
-    Input | Expression | StringLiteral | NumberLiteral | VarRef
+    Input | StringLiteral | NumberLiteral | Expression | VarRef
 ;
 
 Input:

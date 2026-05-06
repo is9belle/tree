@@ -138,6 +138,8 @@ def interpret_value(val):
 def resolve_value(value, env):
     """Evaluate a Value node or raw literal into a concrete runtime value."""
     evaluated = interpret(value, env)
+    if evaluated is None:
+        return None
     return env.get(evaluated, evaluated) if isinstance(evaluated, str) else evaluated
 
 
@@ -151,10 +153,24 @@ def as_statements(body):
 
 def interpret(node, env):
     """Walk the AST and execute nodes."""
+    if node is None:
+        return None
+    
+    # Handle the special case where textX parsed 'input' as a string
+    if isinstance(node, str):
+        if node == 'input':
+            return input()
+        else:
+            raise ValueError(f"interpret() expected a node object, got unexpected string: {repr(node)}")
+    
     cls = node.__class__.__name__
-
+    
     if cls == 'Assignment':
         env[node.var] = resolve_value(node.value, env)
+        return None
+
+    elif cls == 'Comment':
+        return None
 
     elif cls == 'Input':
         return input()
@@ -207,6 +223,7 @@ def interpret(node, env):
             val = resolve_value(value, env)
             output += str(val) + " "
         print(output.strip())
+        return None
 
     elif cls == 'IfStatement':
         if eval_condition(node.condition, env):
@@ -223,11 +240,13 @@ def interpret(node, env):
             if not matched and node.else_body:
                 for stmt in as_statements(node.else_body):
                     interpret(stmt, env)
+        return None
 
     elif cls == 'WhileLoop':
         while eval_condition(node.condition, env):
             for stmt in as_statements(node.body):
                 interpret(stmt, env)
+        return None
 
     elif cls == 'ForLoop':
         interpret(node.init, env)
@@ -235,6 +254,7 @@ def interpret(node, env):
             for stmt in as_statements(node.body):
                 interpret(stmt, env)
             interpret(node.step, env)
+        return None
 
     elif cls == 'StringLiteral':
         return node.value
@@ -245,7 +265,8 @@ def interpret(node, env):
     elif cls == 'VarRef':
         return env.get(node.name, node.name)
 
-    return env
+    # Fallback for unhandled node types
+    raise ValueError(f"Unhandled node type: {cls}")
 
 def eval_condition(cond, env):
     def resolve(v):
