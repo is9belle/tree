@@ -1,6 +1,5 @@
 # tree 🌲
-
-> A programming language where your **folder structure is the source code**.
+A custom programming language built from scratch where your **folder structure is the source code**.
 
 tree is an esoteric programming language built on a simple idea: instead of writing text files, you arrange folders and files in your filesystem. The `tree` command becomes your parser input, folder names are statements, and file names are values.
 
